@@ -133,3 +133,179 @@ puts "CBR packet size = [$cbr set packet_size_]"
 puts "CBR rate = [$cbr set rate_]"
 
 $ns run
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Q.9). WAP to build client server model on different computers.
+
+Code: (C Program)
+
+For output:
+gcc server.c -o server
+./server
+
+SERVER PROGRAM:
+
+#include<netinet/in.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+int main(int argc, char const* argv[])
+{
+int servSockD = socket(AF_INET, SOCK_STREAM, 0);
+char serMsg[255] = "Message from the server to the "
+"client \'Hello Client\' ";
+struct sockaddr_in servAddr;
+servAddr.sin_family = AF_INET;
+servAddr.sin_port = htons(9001);
+servAddr.sin_addr.s_addr = INADDR_ANY;
+bind(servSockD, (struct sockaddr*)&servAddr,
+sizeof(servAddr));
+listen(servSockD, 1);
+int clientSocket = accept(servSockD, NULL, NULL);
+send(clientSocket, serMsg, sizeof(serMsg), 0);
+return 0;
+}
+
+
+CLIENT PROGRAM:
+
+#include<netinet/in.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+
+int main(int argc, char const* argv[])
+{
+int servSockD = socket(AF_INET, SOCK_STREAM, 0);
+char serMsg[255] = "Message from the server to the "
+"client \'Hello Client\' ";
+struct sockaddr_in servAddr;
+servAddr.sin_family = AF_INET;
+servAddr.sin_port = htons(9001);
+servAddr.sin_addr.s_addr = INADDR_ANY;
+bind(servSockD, (struct sockaddr*)&servAddr,
+sizeof(servAddr));
+listen(servSockD, 1);
+int clientSocket = accept(servSockD, NULL, NULL);
+send(clientSocket, serMsg, sizeof(serMsg), 0);
+return 0;
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Code: (In Java)
+
+For Ops: 
+javac AddServer.java
+java AddServer
+
+javac AddClient.java
+java AddClient
+
+Server:
+
+import java.io.*;
+import java.net.*;
+
+public class AddServer {
+public static void main(String[] args) {
+try {
+ServerSocket ss = new ServerSocket(5000);
+System.out.println("Server is waiting for a connection...");
+Socket s = ss.accept();
+System.out.println("Client connected!");
+
+BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+PrintWriter output = new PrintWriter(s.getOutputStream(), true);
+
+int number1 = Integer.parseInt(input.readLine());
+int number2 = Integer.parseInt(input.readLine());
+int sum = number1 + number2;
+
+output.println("The sum is: " + sum);
+
+input.close();
+output.close();
+s.close();
+ss.close();
+} catch (IOException e) {
+System.out.println("Error: " + e.getMessage());
+} catch (NumberFormatException e) {
+System.out.println("Error: Invalid input. Please send valid integers.");
+}
+}
+}
+
+
+Client:
+
+P1:
+
+import java.io.*;
+import java.net.*;
+
+public class AddClient {
+public static void main(String[] args) {
+String serverAddress = "192.168.211.174";
+int serverPort = 5000;
+try (
+Socket socket = new Socket(serverAddress, serverPort);
+BufferedReader serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+PrintWriter serverOutput = new PrintWriter(socket.getOutputStream(), true);
+BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+) {
+System.out.println("Enter first number: ");
+int number1 = Integer.parseInt(userInput.readLine());
+System.out.println("Enter second number: ");
+int number2 = Integer.parseInt(userInput.readLine());
+serverOutput.println(number1);
+serverOutput.println(number2);
+
+String result = serverInput.readLine();
+System.out.println("Result from server: " + result);
+
+} catch (NumberFormatException e) {
+System.out.println("Invalid input. Please enter valid integers.");
+} catch (IOException e) {
+System.out.println("Error: " + e.getMessage());
+}
+}
+}
+
+
+(Try this if P1 didn't worked)P2:
+
+import java.io.*;
+import java.net.*;
+
+public class AddClient {
+public static void main(String[] args) {
+try {
+Socket s = new Socket("localhost", 5000);
+BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+PrintWriter output = new PrintWriter(s.getOutputStream(), true);
+BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+System.out.println("Enter first number: ");
+int number1 = Integer.parseInt(keyboard.readLine());
+
+System.out.println("Enter second number: ");
+int number2 = Integer.parseInt(keyboard.readLine());
+
+output.println(number1);
+output.println(number2);
+
+String response = input.readLine();
+System.out.println("Server says: " + response);
+
+input.close();
+output.close();
+s.close();
+} catch (IOException e) {
+System.out.println("Error: " + e.getMessage());
+}
+}
+}
