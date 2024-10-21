@@ -43,3 +43,92 @@ if __name__ == "__main__":
     main()
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Write theory and SQL query to perform one OLAP operation - (Mobile Sales Database).
+
+Step 1: Create the Database and Tables
+
+
+
+CREATE DATABASE MobileSales;
+
+USE MobileSales;
+
+CREATE TABLE Sales (SaleID INT PRIMARY KEY,SaleDate DATE,ProductName VARCHAR(50),Category VARCHAR(30),Region VARCHAR(30),Amount DECIMAL(10, 2),Quantity INT);
+
+
+
+Step 2: Insert Sample Data
+
+
+INSERT INTO Sales (SaleID, SaleDate, ProductName, Category, Region, Amount, Quantity) VALUES
+(1, '2024-01-01', 'iPhone 14', 'Smartphone', 'North', 999.99, 5),
+(2, '2024-01-02', 'Samsung Galaxy S21', 'Smartphone', 'South', 799.99, 3),
+(3, '2024-02-01', 'Google Pixel 6', 'Smartphone', 'East', 699.99, 2),
+(4, '2024-02-15', 'OnePlus 9', 'Smartphone', 'West', 729.99, 4),
+(5, '2024-03-01', 'iPhone 13', 'Smartphone', 'North', 899.99, 6),
+(6, '2024-03-20', 'Nokia 3310', 'Feature Phone', 'South', 49.99, 10),
+(7, '2024-04-01', 'Samsung Galaxy A52', 'Smartphone', 'East', 399.99, 7),
+(8, '2024-04-10', 'Motorola Moto G', 'Smartphone', 'West', 299.99, 8);
+
+
+Step 3: Perform OLAP Operations
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+1. Drill Down
+
+
+SELECT
+YEAR(SaleDate) AS Year,
+MONTH(SaleDate) AS Month,
+SUM(Amount) AS TotalSales
+FROM Sales
+GROUP BY YEAR(SaleDate), MONTH(SaleDate)
+ORDER BY Year, Month;
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+2. Roll Up
+
+SELECT
+Category,
+SUM(Amount) AS TotalSales
+FROM Sales
+GROUP BY Category;
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+3. Dice
+
+SELECT
+SaleDate,
+ProductName,
+Amount
+FROM Sales
+WHERE Category = 'Smartphone' AND Region = 'North';
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+4. Slice
+
+SELECT
+ProductName,
+Amount
+FROM Sales
+WHERE MONTH(SaleDate) = 3;
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+5. Pivot
+
+SELECT
+ProductName,
+SUM(CASE WHEN Region = 'North' THEN Amount ELSE 0 END) AS NorthSales,
+SUM(CASE WHEN Region = 'South' THEN Amount ELSE 0 END) AS SouthSales,
+SUM(CASE WHEN Region = 'East' THEN Amount ELSE 0 END) AS EastSales,
+SUM(CASE WHEN Region = 'West' THEN Amount ELSE 0 END) AS WestSales
+FROM Sales
+GROUP BY ProductName;
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
