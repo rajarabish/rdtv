@@ -199,7 +199,7 @@ GROUP BY ProductName;
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-Create dimension tables and fact  table using SQL for given case study. 
+Create dimension tables and fact  table using SQL for given case study. (Casestudyname: retail sales)
 
 
 CREATE DATABASE RetailSalesDB;
