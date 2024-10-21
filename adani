@@ -1,253 +1,45 @@
-Q.7). WAP to implement the flow control mechanism of TCP protocol.
-
-save program in text editor as _.tcl
-
-open terminal
+To write a program to find frequent 2-itemset in a given dataset for minimum  support count =2.
 
 Code:
 
-set ns [new Simulator]
-
-$ns color 1 Blue
-$ns color 2 Red
-
-set nf [open out.nam w]
-$ns namtrace-all $nf
-
-proc finish {} {
-global ns nf
-$ns flush-trace
-close $nf
-exec nam out.nam &
-exit 0
-}
-
-set n0 [$ns node]
-set n1 [$ns node]
-set n2 [$ns node]
-set n3 [$ns node]
-
-$ns duplex-link $n0 $n2 2Mb 10ms DropTail
-$ns duplex-link $n1 $n2 2Mb 10ms DropTail
-$ns duplex-link $n2 $n3 1.7Mb 20ms DropTail
-
-$ns queue-limit $n2 $n3 5 ;
-
-$ns duplex-link-op $n0 $n2 orient right-down
-$ns duplex-link-op $n1 $n2 orient right-up
-$ns duplex-link-op $n2 $n3 orient right
-
-$ns duplex-link-op $n2 $n3 queuePos 0.5
-
-set tcp [new Agent/TCP]
-$tcp set class_ 2
-$ns attach-agent $n0 $tcp
-set sink [new Agent/TCPSink]
-$ns attach-agent $n3 $sink
-$ns connect $tcp $sink
-$tcp set fid_ 1
-
-set ftp [new Application/FTP]
-$ftp attach-agent $tcp
-$ftp set type_ FTP
-
-$ftp set file_size_ 1000000 ;
-
-$ns at 1.0 "$ftp start"
-$ns at 4.0 "$ftp stop"
-
-$ns at 4.5 "$ns detach-agent $n0 $tcp ; $ns detach-agent $n3 $sink"
-
-$ns at 5.0 "finish"
-
-set packet_size 1000 ;
-set link_rate 2.0 ;
-puts "TCP packet size = $packet_size bytes"
-puts "Link rate = $link_rate Mbps"
-
-$ns run
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-Q.8). WAP to implement  flow control mechanism of UDP protocol.
-
-save program in text editor as _.tcl
-
-open terminal
-
-Code: 
-
-set ns [new Simulator]
-
-$ns color 1 Blue
-$ns color 2 Red
-
-set nf [open out.nam w]
-$ns namtrace-all $nf
-
-proc finish {} {
-global ns nf
-$ns flush-trace
-close $nf
-exec nam out.nam &
-exit 0
-}
-
-set n0 [$ns node]
-set n1 [$ns node]
-set n2 [$ns node]
-set n3 [$ns node]
-
-$ns duplex-link $n0 $n2 2Mb 10ms DropTail
-$ns duplex-link $n1 $n2 2Mb 10ms DropTail
-$ns duplex-link $n2 $n3 1.7Mb 20ms DropTail
-
-$ns queue-limit $n2 $n3 5 ;
-
-$ns duplex-link-op $n0 $n2 orient right-down
-$ns duplex-link-op $n1 $n2 orient right-up
-$ns duplex-link-op $n2 $n3 orient right
-
-$ns duplex-link-op $n2 $n3 queuePos 0.5
-
-set udp [new Agent/UDP]
-$ns attach-agent $n1 $udp
-set null [new Agent/Null]
-$ns attach-agent $n3 $null
-$ns connect $udp $null
-$udp set fid_ 2
-
-set cbr [new Application/Traffic/CBR]
-$cbr attach-agent $udp
-$cbr set type_ CBR
-$cbr set packet_size_ 1000 ;
-$cbr set rate_ 1.5mb ;
-$cbr set random_ false
-
-$ns at 0.1 "$cbr start"
-$ns at 4.5 "$cbr stop"
-
-$ns at 10.0 "finish"
-
-puts "CBR packet size = [$cbr set packet_size_]"
-puts "CBR rate = [$cbr set rate_]"
-
-$ns run
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-Q.9). WAP to build client server model on different computers.
-
-Code: (In Java)
-
-For Ops: 
-javac AddServer.java
-java AddServer
-
-javac AddClient.java
-java AddClient
-
-Server:
-
-import java.io.*;
-import java.net.*;
-
-public class AddServer {
-public static void main(String[] args) {
-try {
-ServerSocket ss = new ServerSocket(5000);
-System.out.println("Server is waiting for a connection...");
-Socket s = ss.accept();
-System.out.println("Client connected!");
-
-BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
-PrintWriter output = new PrintWriter(s.getOutputStream(), true);
-
-int number1 = Integer.parseInt(input.readLine());
-int number2 = Integer.parseInt(input.readLine());
-int sum = number1 + number2;
-
-output.println("The sum is: " + sum);
-
-input.close();
-output.close();
-s.close();
-ss.close();
-} catch (IOException e) {
-System.out.println("Error: " + e.getMessage());
-} catch (NumberFormatException e) {
-System.out.println("Error: Invalid input. Please send valid integers.");
-}
-}
-}
-
-
-Client:
-
-P1:
-
-import java.io.*;
-import java.net.*;
-
-public class AddClient {
-public static void main(String[] args) {
-String serverAddress = "192.168.211.174";
-int serverPort = 5000;
-try (
-Socket socket = new Socket(serverAddress, serverPort);
-BufferedReader serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-PrintWriter serverOutput = new PrintWriter(socket.getOutputStream(), true);
-BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-) {
-System.out.println("Enter first number: ");
-int number1 = Integer.parseInt(userInput.readLine());
-System.out.println("Enter second number: ");
-int number2 = Integer.parseInt(userInput.readLine());
-serverOutput.println(number1);
-serverOutput.println(number2);
-
-String result = serverInput.readLine();
-System.out.println("Result from server: " + result);
-
-} catch (NumberFormatException e) {
-System.out.println("Invalid input. Please enter valid integers.");
-} catch (IOException e) {
-System.out.println("Error: " + e.getMessage());
-}
-}
-}
-
-
-(Try this if P1 didn't worked)P2:
-
-import java.io.*;
-import java.net.*;
-
-public class AddClient {
-public static void main(String[] args) {
-try {
-Socket s = new Socket("localhost", 5000);
-BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-PrintWriter output = new PrintWriter(s.getOutputStream(), true);
-BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-System.out.println("Enter first number: ");
-int number1 = Integer.parseInt(keyboard.readLine());
-
-System.out.println("Enter second number: ");
-int number2 = Integer.parseInt(keyboard.readLine());
-
-output.println(number1);
-output.println(number2);
-
-String response = input.readLine();
-System.out.println("Server says: " + response);
-
-input.close();
-output.close();
-s.close();
-} catch (IOException e) {
-System.out.println("Error: " + e.getMessage());
-}
-}
-}
+from itertools import combinations
+from collections import Counter
+
+def find_frequent_itemsets(transactions, min_support):
+    item_counts = Counter()
+    for transaction in transactions:
+        for item in transaction:
+            item_counts[item] += 1
+
+    frequent_items = {item: count for item, count in item_counts.items() if count >= min_support}
+    
+    two_itemsets = Counter()
+    for transaction in transactions:
+        for itemset in combinations(sorted(transaction), 2):
+            if itemset[0] in frequent_items and itemset[1] in frequent_items:
+                two_itemsets[itemset] += 1
+
+    frequent_two_itemsets = {itemset: count for itemset, count in two_itemsets.items() if count >= min_support}
+    
+    return frequent_two_itemsets
+
+def main():
+    num_transactions = int(input("Enter the number of transactions: "))
+    transactions = []
+
+    for _ in range(num_transactions):
+        transaction = input("Enter transaction items (comma-separated): ").strip().split(',')
+        transactions.append([item.strip() for item in transaction])
+
+    min_support = 2
+
+    frequent_two_itemsets = find_frequent_itemsets(transactions, min_support)
+    
+    print("\nFrequent 2-itemsets (support count >= {}):".format(min_support))
+    for itemset, count in frequent_two_itemsets.items():
+        print(f"{itemset}: {count}")
+
+if __name__ == "__main__":
+    main()
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
